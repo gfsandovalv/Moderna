@@ -78,6 +78,10 @@ for i in range(1, 5):
     name = 'mass' + str(i)
     masses[name] = pd.read_csv(filename, sep='\t', skiprows=1)
 
+# Converting mass to Kilograms
+for name in list(masses.keys()):
+    masses[name].iloc[:, 1] = masses[name].iloc[:, 1]/1000
+
 # =============================================================================
 # Throughout this interval, the system is out of equilibrium
 # We don't care about this data
@@ -117,4 +121,4 @@ for name in names:
 with open('delta_m.txt', 'w+') as file:
     print('# mass delta_m', file=file)
     for name in names:
-        print(name + ' ' + str(delta_m[name]), file=file)
+        print(name + ' ' + '{:.2e}'.format(delta_m[name]), file=file)
