@@ -121,4 +121,4 @@ for name in names:
 with open('delta_m.txt', 'w+') as file:
     print('# mass delta_m', file=file)
     for name in names:
-        print(name + ' ' + '{:.2e}'.format(delta_m[name]), file=file)
+        print(name + ' ' + '{:.3e}'.format(delta_m[name]), file=file)
