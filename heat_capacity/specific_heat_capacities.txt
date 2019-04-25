@@ -1,0 +1,6 @@
+# substance spec. heat cappacity 
+#Units = J/kg/K
+Iron 5.476e+02
+Aluminium 7.449e+02
+Zinc 4.337e+02
+Copper 3.569e+02
