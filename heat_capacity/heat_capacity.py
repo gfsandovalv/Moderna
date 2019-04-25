@@ -8,6 +8,7 @@ Created on Wed Apr 24 18:19:48 2019
 import pandas as pd
 import numpy as np
 from scipy.stats import linregress as linreg
+
 # =============================================================================
 # functions definitions
 # =============================================================================
@@ -62,7 +63,16 @@ def diff_intercept(before, after, final):
         for i in range(0, 5):
             diff = before[name][i] - after[name][i]
             diff_set = diff_set + (diff, )
-        final[name] = diff_set        
+        final[name] = diff_set
+
+
+def sp_heat_cap(delta_m, mass):
+    L = 1.9e5
+    RoomTemperature = 291.15
+    FinalTemperature = 146.15
+    # Final temperature of the mass reached inside the nitrogen
+    delta_T = RoomTemperature - FinalTemperature
+    return L*delta_m/mass/delta_T
 
 
 # =============================================================================
@@ -72,13 +82,14 @@ def diff_intercept(before, after, final):
 # =============================================================================
 # importing data from *.txt files into a dictionary of DataFrames
 # =============================================================================
+
 masses = {}
 for i in range(1, 5):
     filename = 'masa' + str(i) + '.txt'
     name = 'mass' + str(i)
     masses[name] = pd.read_csv(filename, sep='\t', skiprows=1)
 
-# Converting mass to Kilograms
+# Converting masses to Kilograms
 for name in list(masses.keys()):
     masses[name].iloc[:, 1] = masses[name].iloc[:, 1]/1000
 
@@ -114,11 +125,31 @@ diff_intercept(reg_before,
                reg_after, final_data)
 
 delta_m = {}
+
 for name in names:
     delta_m[name] = final_data[name][1]
 
+masses_values = {'mass1': 28.6*1e-3,
+                 'mass2': 17.1*1e-3,
+                 'mass3': 61.7*1e-3,
+                 'mass4': 44.1*1e-3}
+
+specific_heat_capacity = {}
+names_material = ['Iron', 'Aluminium', 'Zinc', 'Copper']
+for name, material in zip(names, names_material):
+    specific_heat_capacity[material] = sp_heat_cap(
+            delta_m[name],
+            masses_values[name])
 
 with open('delta_m.txt', 'w+') as file:
     print('# mass delta_m', file=file)
     for name in names:
         print(name + ' ' + '{:.3e}'.format(delta_m[name]), file=file)
+
+with open('specific_heat_capacities.txt', 'w+') as file:
+    header = '# substance spec. heat cappacity \n#Units = J/kg/K'
+    print(header, file=file)
+    for name, material in zip(names, names_material):
+        print(material + ' ' +
+              '{:.3e}'.format(specific_heat_capacity[material]),
+              file=file)
